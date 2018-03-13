@@ -4,7 +4,7 @@ If you have to go to the DMV in San Francisco, it can take weeks or even months 
 
 Hmm....repetitive clicking...through a static workflow...with a clear goal...seems like a good job for...A BOT????
 
-Yes, a bot. A bot that will never get tired of checking the DMV webpage for you, and letting you know if it finds something within a preset number of days.
+Yes, a bot. A bot that will never get tired of checking the DMV webpage for you, and letting you know if it finds something within a preset number of days. If you are even slighly comfortable using the command line, this will be that bot for you. 
 
 ## Setup
 
@@ -31,7 +31,7 @@ Yes, a bot. A bot that will never get tired of checking the DMV webpage for you,
 
 6. Write your information to the config file
 
-6. Yes, I know that's two sixes, but it's late and I don't wanna renumber everything. You should probably just test the script at this point before getting into the cronjob stuff. Just run `dmv.sh SAN_FRANCISCO 14` (or whatever city/days into the future you care about checking) and make sure it all works.
+6. You should probably just test the script at this point before getting into the cronjob stuff. Just run `dmv.sh SAN_FRANCISCO 14` (or whatever city/days into the future you care about checking) and make sure it all works.
 
 7. Set up a cronjob to run the script
 
@@ -46,6 +46,8 @@ Yes, a bot. A bot that will never get tired of checking the DMV webpage for you,
     ```
 
     Common pitfall: your cron setup may or may not have PATH set up correctly. If it doesn't, you need to set PATH to include the directory where your `casperjs` cli is located. You can find this out with `which casperjs`.
+
+    Also, look up cron rules to find out more about what the first cryptic characters mean. In this case, they mean "do this thing every minute". 
 
     Also, keep in mind that SAN_FRANCISCO is configurable to another CA DMV (just put it in all caps and separate spaces with underscores. LA would be LOS_ANGELES, for example). Also, the number 14 is the number of days in the future that would be acceptable to you.
 
