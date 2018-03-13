@@ -1,4 +1,4 @@
-# DVM notifier
+# DMV notifier
 
 If you have to go to the DMV in San Francisco, it can take weeks or even months to find an appointment. But people sometimes cancel those appointments! Those cancelled appointments could be yours, if you'd like to click on the DMV site all day hoping to score one.
 
