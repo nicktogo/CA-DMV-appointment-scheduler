@@ -1,0 +1,15 @@
+{
+  "name": "DMV notifier",
+  "version": "0.0.1",
+  "description": "CA DMV text subscriber",
+  "main": "index.js",
+  "author": "Brian Gerson",
+  "license": "MIT",
+  "scripts": {
+  },
+  "dependencies": {
+    "jssha": "^2.2.0",
+    "oauth-1.0a": "^2.0.0"
+  },
+  "devDependencies": {}
+}

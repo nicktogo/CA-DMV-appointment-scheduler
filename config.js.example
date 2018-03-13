@@ -1,0 +1,28 @@
+module.exports = {
+  firstName: 'barley',
+  lastName: 'barker',
+  areaCode: '123',
+  telPrefix: '456',
+  telSuffix: '4321',
+  twilio: {
+    accountSid: 'WOWASECRED',
+    authToken: 'ALSOPRETTYSECRET',
+    toNumber: '+12223334444',
+    fromNumber: '+12223335555', 
+  },
+  // I just stuck this in here for convenience
+  monthMap: {
+        January: '01',
+        February: '02',
+        March: '03',
+        April: '04',
+        May: '05',
+        June: '06',
+        July: '07',
+        August: '08',
+        September: '09',
+        October: '10',
+        November: '11',
+        December: '12'
+      }
+};
