@@ -63,7 +63,8 @@ Yes, a bot. A bot that will never get tired of checking the DMV webpage for you,
     PATH=/Users/briangerson/.nvm/versions/node/v4.3.2/bin/:/usr/bin/
     ```
 
-8. You should be all set.
+8. You should be all set. If the bot finds an appt within the timeframe you specified, it'll text you an alert with a link to schedule your appointment. 
+
 
 ## Thank Yous
 This service was heavily inspired by (and built around the foundation of) the GOES notifier built by Oliver Song which can be found at https://github.com/oliversong/goes-notifier. That's a pretty dope service as well. (Apparently it is deprecated, but there are links to working solutions available there).
