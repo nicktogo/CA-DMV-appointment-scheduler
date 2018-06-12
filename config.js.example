@@ -1,15 +1,9 @@
 module.exports = {
-  firstName: 'barley',
-  lastName: 'barker',
-  areaCode: '123',
-  telPrefix: '456',
-  telSuffix: '4321',
-  twilio: {
-    accountSid: 'WOWASECRED',
-    authToken: 'ALSOPRETTYSECRET',
-    toNumber: '+12223334444',
-    fromNumber: '+12223335555', 
-  },
+  firstName: 'Firstname',
+  lastName: 'LastName',
+  areaCode: '111',
+  telPrefix: '222',
+  telSuffix: '3333',
   // I just stuck this in here for convenience
   monthMap: {
         January: '01',
@@ -24,5 +18,8 @@ module.exports = {
         October: '10',
         November: '11',
         December: '12'
-      }
+    },
+    botToken: 'botToken',
+    chatId: 'chatId',
+    text: 'success to book'
 };

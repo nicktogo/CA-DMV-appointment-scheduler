@@ -1,6 +1,7 @@
 'use strict'
 
 var config = require('./config');
+var utils = require('utils');
 
 var url = 'https://www.dmv.ca.gov/wasapp/foa/clear.do?goTo=officeVisit';
 var firstName = config.firstName;
@@ -9,24 +10,17 @@ var areaCode = config.areaCode;
 var telPrefix = config.telPrefix;
 var telSuffix = config.telSuffix;
 
-var accountSid = config.twilio.accountSid;
-var authToken = config.twilio.authToken;
-var toNumber = config.twilio.toNumber;
-var fromNumber = config.twilio.fromNumber;
-
 var monthMap = config.monthMap;
 
-var twilioLinked = (
-  accountSid &&
-  authToken &&
-  toNumber &&
-  fromNumber
-);
+var botToken = config.botToken;
+var chatId = config.chatId;
+var text = config.text;
 
 var city;
 var rawDate;
 var days;
 var notify;
+var booked = false;
 
 function CasperException(message, stack) {
   this.name = 'CasperException';
@@ -41,7 +35,7 @@ function createAGhost() {
     verbose: true
   });
 
-  city = casper.cli.get('city').split('_').join(' ');
+  city = casper.cli.get('city');
   days = casper.cli.get('days');
 
   casper.on('error', function(msg, backtrace) {
@@ -65,13 +59,10 @@ function runTheGhooooOOoost () {
 
   casper.then(function() {
     this.echo('selecting a city...');
-    var value = this.evaluate(function () {
-      return $('select option')
-      .filter(function () { return $(this).html() === city; }).val()
-    })
-    this.evaluate(function() {
-      $('select option:eq(122)').prop('selected', true);
-    });
+    var selector = utils.format('select option:eq(%s)', city);
+    this.evaluate(function(selector) {
+      $(selector).prop('selected', true);
+    }, selector);
   });
 
   casper.then(function () {
@@ -81,7 +72,7 @@ function runTheGhooooOOoost () {
 
   casper.then(function() {
     this.echo('Clicking on "Replace ID"');
-    this.click('#taskCID');
+    this.click('#taskRID');
   });
 
   casper.then(function () {
@@ -116,7 +107,12 @@ function runTheGhooooOOoost () {
 
   casper.then(function () {
     this.echo('Waiting for next page to load');
-    this.waitForSelector('.panel-heading');
+    this.waitForSelector('.panel-heading', function _then() {
+        this.echo('Page loaded.');
+    }, function _onTimeout() {
+        this.echo('Timeout, give up.');
+        this.exit();
+    });
   });
 
   casper.then(function () {
@@ -124,8 +120,13 @@ function runTheGhooooOOoost () {
     rawDate = this.evaluate(function() {
       var apptTime = $('[data-title="Appointment"]').children().last().text().trim();
       console.log('Appointment time is', apptTime);
-      return apptTime.match(/(March|April|May)\W\d+/);
+      return apptTime.match(/(June|July|August)\W\d+/);
     });
+    
+    this.evaluate(function() {
+      var office = $('[data-title="Office"]').children().first().text().trim();
+      console.log('Office is: ', office);
+    })
   });
 
   casper.then(function () {
@@ -148,34 +149,11 @@ function runTheGhooooOOoost () {
       
       console.log(numDays);
       
-      if (numDays < days) {
+      if (numDays < days && numDays >= 1) {
         console.log('it is good!');
         notify = true;
+        makeAppointment(this);
       }
-    }
-  });
-
-  casper.then(function() {
-    console.log(rawDate)
-    if (twilioLinked && notify) {
-      var messageBody = 'New appointment slot open: ' + rawDate[0] + 
-      '. Schedule appointment here: https://www.dmv.ca.gov/wasapp/foa/findOfficeVisit.do';
-
-      this.echo('Sending twilio request...');
-      this.open(
-        'https://' + accountSid + ':' + authToken + '@' +
-        'api.twilio.com/2010-04-01/Accounts/' + accountSid + '/Messages',
-        {
-          method: 'post',
-          data: {
-            To: toNumber,
-            From: fromNumber,
-            Body: messageBody
-          },
-        }
-      ).then(function() {
-        require('utils').dump(this.getPageContent());
-      });
     }
   });
 
@@ -185,5 +163,75 @@ function runTheGhooooOOoost () {
   });
 }
 
-runTheGhooooOOoost();
+function makeAppointment(casper) {
+    casper.then(function() {
+        this.echo('Clicking on "Continue" to schedule');
+        this.click('.btn-primary');
+    });
+    
+    casper.then(function() {
+        this.echo('Waiting for next page to load');
+        this.waitForSelector('#none_method', function _then() {
+            this.echo('Page loaded.');
+        }, function _onTimeout() {
+            this.echo('Timeout, give up.');
+            this.exit();
+        });
+    });
+    
+    casper.then(function() {
+        this.echo('Sending area code...');
+        this.sendKeys('#notify_telArea', areaCode);
+    });
+    
+    casper.then(function() {
+        this.echo('Sending telPrefix...');
+        this.sendKeys('#notify_telPrefix', telPrefix);
+    });
+    
+    casper.then(function() {
+        this.echo('Sending telSuffix...');
+        this.sendKeys('#notify_telSuffix', telSuffix);
+    });
+    
+    casper.then(function() {
+        this.echo('Clicking on "Continue" to schedule');
+        this.click('.btn-primary');
+    });
+    
+    casper.then(function() {
+        this.echo('Waiting for next page to load');
+        this.waitForSelector('.warning', function _then() {
+            this.echo('Page loaded.');
+        }, function _onTimeout() {
+            this.echo('Timeout, give up.');
+            this.exit();
+        });
+    });
+    
+    casper.then(function() {
+        this.echo('Clicking on "Confirm" to confirm');
+        this.click('.btn-primary');
+    });
+    
+    casper.then(function() {
+        this.echo('Waiting for next page to load');
+        this.waitForSelector('.alert-success', function _then() {
+            this.echo('Page loaded.');
+        }, function _onTimeout() {
+            this.echo('Timeout, give up.');
+            this.exit();
+        });
+        this.echo('Success to book!');
+    });
+    
+    casper.then(function() {
+        var url = utils.format('https://api.telegram.org/%s/sendMessage?chat_id=%s&text=%s', botToken, chatId, text);
+        this.open(url).then(function () {
+            this.echo('Message sent.');
+            booked = true;
+        });
+    })
+}
 
+runTheGhooooOOoost();
