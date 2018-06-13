@@ -1,3 +1,13 @@
+# NOTE
+
+This repo is modified from [brianpgerson/dmv-appointment-helper](https://github.com/brianpgerson/dmv-appointment-helper). Thanks briangerson's contribution.
+
+Things are changed:
+- replace twilio with telegram bot.
+    - Please refer to https://www.forsomedefinition.com/automation/creating-telegram-bot-notifications/ about how to create bot for notifications.
+- export PATH in `dmv.sh`.
+- add steps to actually schedule an appointment when the timing fits.
+
 # DMV notifier
 
 If you have to go to the DMV in San Francisco, it can take weeks or even months to find an appointment. But people sometimes cancel those appointments! Those cancelled appointments could be yours, if you'd like to click on the DMV site all day hoping to score one.
@@ -12,6 +22,7 @@ Yes, a bot. A bot that will never get tired of checking the DMV webpage for you,
 2. Install local dependencies
 
     ```
+    cd path/to/CA-DMV-appointment-scheduler
     npm install
     ```
 
@@ -21,17 +32,20 @@ Yes, a bot. A bot that will never get tired of checking the DMV webpage for you,
     npm install -g phantomjs
     npm install -g casperjs
     ```
-
-4. Make a Twilio account / messaging service / phone number: [https://www.twilio.com/try-twilio](https://www.twilio.com/try-twilio)
-5. Make a config file
+4. Make a config file
 
     ```
     cp config.js.example config.js
     ```
 
-6. Write your information to the config file
+5. Write your information to the config file
 
-6. You should probably just test the script at this point before getting into the cronjob stuff. Just run `dmv.sh SAN_FRANCISCO 14` (or whatever city/days into the future you care about checking) and make sure it all works.
+6. Change line 123 to match the following three months. For example, if current month is June, then match `June|July|August`.
+
+6. You should probably just test the script at this point before getting into the cronjob stuff. 
+Just run `dmv.sh 124 40` (or whatever city/days into the future you care about checking) and make sure it all works.
+The number 124 is the city's index in the dropdown list. For example, as of Jun 12 2018, 122 is SAN FRANCISCO, 123 is SAN JOSE, 124 is SAN JOSE DLPC. It is tedious, but it works. haha
+The number 40 is the number of days in the future that would be acceptable to you.
 
 7. Set up a cronjob to run the script
 
@@ -42,28 +56,32 @@ Yes, a bot. A bot that will never get tired of checking the DMV webpage for you,
     then add
 
     ```
-    */1 * * * * cd PATH/TO/dmv-notifier/ && ./dmv.sh SAN_FRANCISCO 140 >/tmp/stdout.log 2>/tmp/stderr.log
+    */1 * * * * cd PATH/TO/CA-DMV-appointment-scheduler/ && ./dmv.sh 123 40 >/tmp/stdout.log 2>/tmp/stderr.log
+    */3 * * * * cd PATH/TO/CA-DMV-appointment-scheduler/ && ./dmv.sh 124 40 >/tmp/stdout.log 2>/tmp/stderr.log
     ```
+    The first line means try to schedule an appointment at SAN JOSE office for the next 40 days every minute.
+    The second line means try to schedule an appointment at SAN JOSE DLPC office for the next 40 days every 3 minutes.
+    
+    Look up cron rules to find out more about what the first cryptic characters mean.
 
     Common pitfall: your cron setup may or may not have PATH set up correctly. If it doesn't, you need to set PATH to include the directory where your `casperjs` cli is located. You can find this out with `which casperjs`.
-
-    Also, look up cron rules to find out more about what the first cryptic characters mean. In this case, they mean "do this thing every minute". 
-
-    Also, keep in mind that SAN_FRANCISCO is configurable to another CA DMV (just put it in all caps and separate spaces with underscores. LA would be LOS_ANGELES, for example). Also, the number 14 is the number of days in the future that would be acceptable to you.
-
+    
     A possible bin PATH might be: 
 
     ```
     PATH=/usr/local/bin
     ```
+    
+    I already set the PATH in `dmv.sh` for you. This PATH works for me.
+    If it is not the same as your output of `which casperjs`, go head and change the `dmv.sh` 
 
-    Another possible bin PATH (the one that works for me, for example):
+    Another possible bin PATH (the one that works for original author, for example):
 
     ```
     PATH=/Users/briangerson/.nvm/versions/node/v4.3.2/bin/:/usr/bin/
     ```
 
-8. You should be all set. If the bot finds an appt within the timeframe you specified, it'll text you an alert with a link to schedule your appointment. 
+8. You should be all set. If the bot finds an appointment within the timeframe you specified, it'll schedule the appointment and send a telegram message to you. The timeframe is [1, days).
 
 
 ## Thank Yous
