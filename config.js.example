@@ -4,6 +4,10 @@ module.exports = {
   areaCode: '111',
   telPrefix: '222',
   telSuffix: '3333',
+  birthMM: '44',
+  birthDD: '55',
+  birthYYYY: '6666',
+  dlNumber: '77777777',
   // I just stuck this in here for convenience
   monthMap: {
         January: '01',
