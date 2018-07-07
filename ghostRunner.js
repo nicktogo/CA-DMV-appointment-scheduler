@@ -3,12 +3,17 @@
 var config = require('./config');
 var utils = require('utils');
 
-var url = 'https://www.dmv.ca.gov/wasapp/foa/clear.do?goTo=officeVisit';
+var url = 'https://www.dmv.ca.gov/wasapp/foa/clear.do?goTo=driveTest&localeName=en';
 var firstName = config.firstName;
 var lastName = config.lastName;
 var areaCode = config.areaCode;
 var telPrefix = config.telPrefix;
 var telSuffix = config.telSuffix;
+
+var dlNumber = config.dlNumber;
+var birthMM = config.birthMM;
+var birthDD = config.birthDD;
+var birthYYYY = config.birthYYYY;
 
 var monthMap = config.monthMap;
 
@@ -66,13 +71,8 @@ function runTheGhooooOOoost () {
   });
 
   casper.then(function () {
-    this.echo('Clicking a one task...');
-    this.click('#one_task');
-  });
-
-  casper.then(function() {
-    this.echo('Clicking on "Replace ID"');
-    this.click('#taskRID');
+    this.echo('Clicking on Automobile...');
+    this.click('#DT');
   });
 
   casper.then(function () {
@@ -83,6 +83,26 @@ function runTheGhooooOOoost () {
   casper.then(function() {
     this.echo('Sending last name...');
     this.sendKeys('#last_name', lastName);
+  });
+  
+  casper.then(function() {
+     this.echo('Sending DL number...');
+     this.sendKeys('#dl_number', dlNumber); 
+  });
+  
+  casper.then(function() {
+     this.echo('Sending birthMM...');
+     this.sendKeys('#birthMonth', birthMM);
+  });
+  
+  casper.then(function() {
+     this.echo('Sending birthDD...');
+     this.sendKeys('#birthDay', birthDD);
+  });
+  
+  casper.then(function() {
+     this.echo('Sending birthYYYY...');
+     this.sendKeys('#birthYear', birthYYYY);
   });
 
   casper.then(function() {
@@ -149,7 +169,7 @@ function runTheGhooooOOoost () {
       
       console.log(numDays);
       
-      if (numDays < days && numDays >= 1) {
+      if (numDays < days && numDays >= 14) {
         console.log('it is good!');
         notify = true;
         makeAppointment(this);
