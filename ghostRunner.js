@@ -3,6 +3,12 @@
 var config = require('./config');
 var utils = require('utils');
 
+var findDriveTestUrl = 'https://www.dmv.ca.gov/wasapp/foa/findDriveTest.do';
+var checkForDriveTestConflictsUrl = 'https://www.dmv.ca.gov/wasapp/foa/checkForDriveTestConflicts.do';
+var selectNotificationUrl = 'https://www.dmv.ca.gov/wasapp/foa/selectNotification.do';
+var confirmApptUrl = 'https://www.dmv.ca.gov/wasapp/foa/confirmAppt.do';
+// var recaptchaToken = config.g-recaptcha-response;
+
 var url = 'https://www.dmv.ca.gov/wasapp/foa/clear.do?goTo=driveTest&localeName=en';
 var firstName = config.firstName;
 var lastName = config.lastName;
@@ -56,83 +62,36 @@ function createAGhost() {
 
 function runTheGhooooOOoost () {
   var casper = createAGhost();
-  casper.start(url);
+  casper.start();
+  
+  casper.then(function() {
+     var body = {
+         'numberItems': '1',
+         'mode': 'DriveTest',
+         'officeId': '632',
+         'requestedTask': 'DT',
+         'firstName': firstName,
+         'lastName': lastName,
+         'dlNumber': dlNumber,
+         'birthMonth': birthMM,
+         'birthDay': birthDD,
+         'birthYear': birthYYYY,
+         'telArea': areaCode,
+         'telPrefix': telPrefix,
+         'telSuffix': telSuffix,
+         'resetCheckFields': 'true'
+     };
+     httpPost(this, findDriveTestUrl, body);
+     this.waitForSelector('#ApptForm', function _then() {
+         this.echo('Page loaded.');
+     }, function _onTimeout() {
+         this.echo('Timeout, give up.');
+         this.exit();
+     });
+  });
 
   casper.then(function() {
     this.echo('Landed on page: ' + this.getTitle());
-  });
-
-  casper.then(function() {
-    this.echo('selecting a city...');
-    var selector = utils.format('select option:eq(%s)', city);
-    this.evaluate(function(selector) {
-      $(selector).prop('selected', true);
-    }, selector);
-  });
-
-  casper.then(function () {
-    this.echo('Clicking on Automobile...');
-    this.click('#DT');
-  });
-
-  casper.then(function () {
-    this.echo('Sending first name...');
-    this.sendKeys('#first_name', firstName);
-  });
-
-  casper.then(function() {
-    this.echo('Sending last name...');
-    this.sendKeys('#last_name', lastName);
-  });
-  
-  casper.then(function() {
-     this.echo('Sending DL number...');
-     this.sendKeys('#dl_number', dlNumber); 
-  });
-  
-  casper.then(function() {
-     this.echo('Sending birthMM...');
-     this.sendKeys('#birthMonth', birthMM);
-  });
-  
-  casper.then(function() {
-     this.echo('Sending birthDD...');
-     this.sendKeys('#birthDay', birthDD);
-  });
-  
-  casper.then(function() {
-     this.echo('Sending birthYYYY...');
-     this.sendKeys('#birthYear', birthYYYY);
-  });
-
-  casper.then(function() {
-    this.echo('Sending area code...');
-    this.sendKeys('#areaCode', areaCode);
-  });
-
-  casper.then(function() {
-    this.echo('Sending telPrefix...');
-    this.sendKeys('#telPrefix', telPrefix);
-  });
-
-  casper.then(function() {
-    this.echo('Sending telSuffix...');
-    this.sendKeys('#telSuffix', telSuffix);
-  });
-
-  casper.then(function() {
-    this.echo('Clicking on "Continue"');
-    this.click('.btn-primary');
-  });
-
-  casper.then(function () {
-    this.echo('Waiting for next page to load');
-    this.waitForSelector('.panel-heading', function _then() {
-        this.echo('Page loaded.');
-    }, function _onTimeout() {
-        this.echo('Timeout, give up.');
-        this.exit();
-    });
   });
 
   casper.then(function () {
@@ -184,9 +143,9 @@ function runTheGhooooOOoost () {
 }
 
 function makeAppointment(casper) {
+    
     casper.then(function() {
-        this.echo('Clicking on "Continue" to schedule');
-        this.click('.btn-primary');
+        httpPost(this, checkForDriveTestConflictsUrl, {});
     });
     
     casper.then(function() {
@@ -200,23 +159,24 @@ function makeAppointment(casper) {
     });
     
     casper.then(function() {
-        this.echo('Sending area code...');
-        this.sendKeys('#notify_telArea', areaCode);
-    });
-    
-    casper.then(function() {
-        this.echo('Sending telPrefix...');
-        this.sendKeys('#notify_telPrefix', telPrefix);
-    });
-    
-    casper.then(function() {
-        this.echo('Sending telSuffix...');
-        this.sendKeys('#notify_telSuffix', telSuffix);
-    });
-    
-    casper.then(function() {
-        this.echo('Clicking on "Continue" to schedule');
-        this.click('.btn-primary');
+        var data = {
+            'notify_smsTelArea': '',
+            'notify_smsTelPrefix': '',
+            'notify_smsTelSuffix': '',
+            'notify_smsTelArea_confirm': '',
+            'notify_smsTelPrefix_confirm': '',
+            'notify_smsTelSuffix_confirm': '',
+            'notify_email': '',
+            'notify_email_confirm': '',
+            'telArea': areaCode,
+            'telPrefix': telPrefix,
+            'telSuffix': telSuffix,
+            'notify_telArea': '',
+            'notify_telPrefix': '',
+            'notify_telSuffix': '',
+            'notificationMethod': 'NONE'
+        };
+        httpPost(this, selectNotificationUrl, data);
     });
     
     casper.then(function() {
@@ -230,9 +190,8 @@ function makeAppointment(casper) {
     });
     
     casper.then(function() {
-        this.echo('Clicking on "Confirm" to confirm');
-        this.click('.btn-primary');
-    });
+        httpPost(this, confirmApptUrl, {});
+    })
     
     casper.then(function() {
         this.echo('Waiting for next page to load');
@@ -250,6 +209,21 @@ function makeAppointment(casper) {
         this.open(url).then(function () {
             this.echo('Message sent.');
             booked = true;
+        });
+    })
+}
+
+function httpPost(casper, url, data) {
+    casper.then(function() {
+        this.open(url, {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'insomnia/5.16.1'
+            },
+            data: data
+        }).then(function() {
+            this.echo(utils.format('Posting to %s', url));
         });
     })
 }
