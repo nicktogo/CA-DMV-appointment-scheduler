@@ -27,7 +27,7 @@ var botToken = config.botToken;
 var chatId = config.chatId;
 var text = config.text;
 
-var city;
+var officeId;
 var rawDate;
 var days;
 var notify;
@@ -46,7 +46,7 @@ function createAGhost() {
     verbose: true
   });
 
-  city = casper.cli.get('city');
+  officeId = casper.cli.get('officeId');
   days = casper.cli.get('days');
 
   casper.on('error', function(msg, backtrace) {
@@ -68,7 +68,7 @@ function runTheGhooooOOoost () {
      var body = {
          'numberItems': '1',
          'mode': 'DriveTest',
-         'officeId': '632',
+         'officeId': officeId,
          'requestedTask': 'DT',
          'firstName': firstName,
          'lastName': lastName,

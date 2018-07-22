@@ -1,5 +1,13 @@
 # NOTE
 
+PLEASE DON'T ABUSE THIS PROGRAM. USE IT PROPERLY AND LEAVE APPOINTMENTS TO PEOPLE WHO ALSO NEED THEM.
+DO NOT SCHEDULE TO MANY APPOINTMENTS. CANCEL ADDITIONAL APPOINTMENTS IF YOU FINISH YOUR STAFF AT DMV.
+
+CA DMV introduced Google Recaptcha to avoid being polled by program.
+This repo bypass the recaptcha and help make drive test appointment.
+
+`master` branch of this repo was used to make appointment for written test and it does not have the code change to bypass recaptcha. I only add the bypassing to `behind_the_wheel_appointment` branch. Please refer to `behind_the_wheel_appointment` if you want to use `master` to schedule written test.
+
 This repo is modified from [brianpgerson/dmv-appointment-helper](https://github.com/brianpgerson/dmv-appointment-helper). Thanks briangerson's contribution.
 
 Things are changed:
@@ -7,6 +15,7 @@ Things are changed:
     - Please refer to https://www.forsomedefinition.com/automation/creating-telegram-bot-notifications/ about how to create bot for notifications.
 - export PATH in `dmv.sh`.
 - add steps to actually schedule an appointment when the timing fits.
+- bypass Google Recaptcha.
 
 # DMV notifier
 
@@ -40,11 +49,9 @@ Yes, a bot. A bot that will never get tired of checking the DMV webpage for you,
 
 5. Write your information to the config file
 
-6. Change line 123 to match the following three months. For example, if current month is June, then match `June|July|August`.
-
 6. You should probably just test the script at this point before getting into the cronjob stuff. 
-Just run `dmv.sh 124 40` (or whatever city/days into the future you care about checking) and make sure it all works.
-The number 124 is the city's index in the dropdown list. For example, as of Jun 12 2018, 122 is SAN FRANCISCO, 123 is SAN JOSE, 124 is SAN JOSE DLPC. It is tedious, but it works. haha
+Just run `dmv.sh 632 40` (or whatever office/days into the future you care about checking) and make sure it all works.
+You can find the officeId in the dropdown menu's HTML content. For example, 632 is Santa Clara DMV. See [Office-ID.md](Office-ID.md) for other DMVs.  
 The number 40 is the number of days in the future that would be acceptable to you.
 
 7. Set up a cronjob to run the script
@@ -56,11 +63,9 @@ The number 40 is the number of days in the future that would be acceptable to yo
     then add
 
     ```
-    */1 * * * * cd PATH/TO/CA-DMV-appointment-scheduler/ && ./dmv.sh 123 40 >/tmp/stdout.log 2>/tmp/stderr.log
-    */3 * * * * cd PATH/TO/CA-DMV-appointment-scheduler/ && ./dmv.sh 124 40 >/tmp/stdout.log 2>/tmp/stderr.log
+    */1 * * * * cd PATH/TO/CA-DMV-appointment-scheduler/ && ./dmv.sh 632 40 >/tmp/stdout.log 2>/tmp/stderr.log
     ```
-    The first line means try to schedule an appointment at SAN JOSE office for the next 40 days every minute.
-    The second line means try to schedule an appointment at SAN JOSE DLPC office for the next 40 days every 3 minutes.
+    The first line means try to schedule an appointment at Santa Clara office for the next 40 days every minute.
     
     Look up cron rules to find out more about what the first cryptic characters mean.
 
