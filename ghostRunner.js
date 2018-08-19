@@ -128,7 +128,7 @@ function runTheGhooooOOoost () {
       
       console.log(numDays);
       
-      if (numDays < days && numDays >= 14) {
+      if (numDays < days && numDays >= 1) {
         console.log('it is good!');
         notify = true;
         makeAppointment(this);
