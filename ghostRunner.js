@@ -120,7 +120,7 @@ function runTheGhooooOOoost () {
     rawDate = this.evaluate(function() {
       var apptTime = $('[data-title="Appointment"]').children().last().text().trim();
       console.log('Appointment time is', apptTime);
-      return apptTime.match(/(June|July|August)\W\d+/);
+      return apptTime.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\W\d+/);
     });
     
     this.evaluate(function() {
