@@ -6,7 +6,7 @@ DO NOT SCHEDULE TO MANY APPOINTMENTS. CANCEL ADDITIONAL APPOINTMENTS IF YOU FINI
 CA DMV introduced Google Recaptcha to avoid being polled by program.
 This repo bypass the recaptcha and help make drive test appointment.
 
-`master` branch of this repo was used to make appointment for written test and it does not have the code change to bypass recaptcha. I only add the bypassing to `behind_the_wheel_appointment` branch. Please refer to `behind_the_wheel_appointment` if you want to use `master` to schedule written test.
+`master` branch of this repo was used to make appointment for written test and it does not have the code change to bypass recaptcha. I only add the bypassing to `behind_the_wheel_appointment` branch. Please refer to `behind_the_wheel_appointment` if you want to use `master` to schedule written test. You are more than welcome to open PR for the changes. 
 
 This repo is modified from [brianpgerson/dmv-appointment-helper](https://github.com/brianpgerson/dmv-appointment-helper). Thanks briangerson's contribution.
 
